@@ -5,7 +5,7 @@
 
 namespace grad {
 
-enum class Operation { NONE, ADD, SUBTRACT, MULTIPLY, DIVIDE };
+enum class Operation { NONE, ADD, MULTIPLY };
 
 struct Value {
   Value(float data, const Operation op = Operation::NONE);
@@ -13,6 +13,9 @@ struct Value {
 
   Value operator+(const Value& other) const;
   Value operator*(const Value& other) const;
+
+  friend Value operator+(float scalar, const Value& value);
+  friend Value operator*(float scalar, const Value& value);
 
   float data;
   float grad;

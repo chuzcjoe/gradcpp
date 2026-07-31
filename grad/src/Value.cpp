@@ -14,4 +14,12 @@ Value Value::operator*(const Value& other) const {
   return Value(new_data, Operation::MULTIPLY);
 }
 
+Value operator+(float scalar, const Value& value) {
+  return Value(scalar) + value;
+}
+
+Value operator*(float scalar, const Value& value) {
+  return Value(scalar) * value;
+}
+
 }  // namespace grad
