@@ -2,6 +2,7 @@
 
 #include <array>
 #include <memory>
+#include <vector>
 
 namespace grad {
 
@@ -22,11 +23,9 @@ struct Value {
   [[nodiscard]] float data() const;
   [[nodiscard]] float grad() const;
   [[nodiscard]] const std::array<std::shared_ptr<Node>, 2>& previous() const;
+  [[nodiscard]] std::vector<std::shared_ptr<Node>> BuildTopoOrder() const;
 
   std::shared_ptr<Node> node;
-
-  // void BuildTopoOrder(const std::shared_ptr<Node>& start_node,
-  //                     std::vector<std::shared_ptr<Node>>& topo_order) const;
 
  private:
   explicit Value(std::shared_ptr<Node> node);

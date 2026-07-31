@@ -42,25 +42,33 @@ Value operator*(float scalar, const Value& value) {
   return Value(scalar) * value;
 }
 
-// void Value::BuildTopoOrder(std::vector<std::shared_ptr<Node>>& topo_order)
-// const {
-//   std::unordered_set<std::shared_ptr<Node>> visited;
-//   std::function<void(const std::shared_ptr<Node>&)> dfs =
-//       [&](const std::shared_ptr<Node>& node) {
-//         if (!node || visited.count(node)) return;
-//         visited.insert(node);
-//         for (const auto& prev : node->previous) {
-//           dfs(prev);
-//         }
-//         topo_order.push_back(node);
-//       };
-//   dfs(node);
-// }
-
 float Value::data() const { return node->data; }
 float Value::grad() const { return node->grad; }
 const std::array<std::shared_ptr<Value::Node>, 2>& Value::previous() const {
   return node->previous;
+}
+
+std::vector<std::shared_ptr<Value::Node>> Value::BuildTopoOrder() const {
+  std::vector<std::shared_ptr<Node>> order;
+  std::unordered_set<const Node*> visited;
+
+  const auto visit = [&visited, &order](
+                         auto&& self,
+                         const std::shared_ptr<Node>& current) -> void {
+    if (current == nullptr || !visited.insert(current.get()).second) {
+      return;
+    }
+
+    for (const auto& previous : current->previous) {
+      self(self, previous);
+    }
+
+    order.push_back(current);
+  };
+
+  visit(visit, node);
+
+  return order;
 }
 
 std::ostream& operator<<(std::ostream& os,
