@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# Pre-commit hook: runs clang-format and clang-tidy on staged C++ files.
+# Installed automatically via `git config core.hooksPath .githooks`
+# (done for you the first time you run ./build.sh).
+set -euo pipefail
+
+BUILD_DIR="build"
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(c|cc|cpp|cxx|h|hh|hpp|hxx)$' || true)
+
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+run_clang_format() {
+  echo "Running clang-format..."
+  if ! command -v clang-format > /dev/null 2>&1; then
+    echo "  x clang-format not found on PATH. Install it using your system's package manager and try again."
+    return 1
+  fi
+
+  while IFS= read -r file; do
+    [ -z "$file" ] && continue
+    clang-format -i "$file"
+    git add -- "$file"
+    echo "  formatted $file"
+  done <<< "$STAGED_FILES"
+
+  echo "  clang-format completed"
+}
+
+run_clang_tidy() {
+  echo "Running clang-tidy check..."
+  if ! command -v clang-tidy > /dev/null 2>&1; then
+    echo "  x clang-tidy not found on PATH. Install it using your system's package manager and try again."
+    return 1
+  fi
+  if [ ! -f "$BUILD_DIR/compile_commands.json" ]; then
+    echo "  x $BUILD_DIR/compile_commands.json not found. Run ./build.sh first, then try again."
+    return 1
+  fi
+
+  local failed=0
+  while IFS= read -r file; do
+    [ -z "$file" ] && continue
+    case "$file" in
+      *.cpp|*.cc|*.cxx)
+        # clang-tidy exits 0 even when it reports warnings unless told
+        # otherwise, so force warnings to fail the commit here. --quiet
+        # drops the "N warnings suppressed in non-user code" boilerplate
+        # for diagnostics coming from system headers (e.g. <iostream>).
+        if ! clang-tidy -p "$BUILD_DIR" --quiet --warnings-as-errors='*' "$file"; then
+          failed=1
+        fi
+        ;;
+    esac
+  done <<< "$STAGED_FILES"
+
+  if [ "$failed" -ne 0 ]; then
+    echo "clang-tidy check failed. Fix the issues above and try again."
+    return 1
+  fi
+  echo "  clang-tidy passed"
+}
+
+FORMAT_STATUS=0
+TIDY_STATUS=0
+run_clang_format || FORMAT_STATUS=$?
+run_clang_tidy || TIDY_STATUS=$?
+
+if [ "$FORMAT_STATUS" -ne 0 ] || [ "$TIDY_STATUS" -ne 0 ]; then
+  exit 1
+fi
