@@ -1,5 +1,7 @@
 #include "Value.h"
 
+#include <ostream>
+
 namespace grad {
 
 Value::Value(float data, const Operation op)
@@ -27,6 +29,11 @@ Value operator+(float scalar, const Value& value) {
 
 Value operator*(float scalar, const Value& value) {
   return Value(scalar) * value;
+}
+
+std::ostream& operator<<(std::ostream& os,
+                         const std::shared_ptr<Value::Node>& node) {
+  return os << "[Value(" << node->data << "), grad=" << node->grad << "]";
 }
 
 }  // namespace grad

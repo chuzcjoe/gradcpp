@@ -22,18 +22,18 @@ int main() {
   std::cout << "a * 2 = " << g.node->data << '\n';
   std::cout << "2 * a = " << h.node->data << '\n';
 
-  std::cout << "c previous nodes: " << c.node->previous[0]->data << ", "
-            << c.node->previous[1]->data << '\n';
-  std::cout << "d previous nodes: " << d.node->previous[0]->data << ", "
-            << d.node->previous[1]->data << '\n';
-  std::cout << "e previous nodes: " << e.node->previous[0]->data << ", "
-            << e.node->previous[1]->data << '\n';
-  std::cout << "f previous nodes: " << f.node->previous[0]->data << ", "
-            << f.node->previous[1]->data << '\n';
-  std::cout << "g previous nodes: " << g.node->previous[0]->data << ", "
-            << g.node->previous[1]->data << '\n';
-  std::cout << "h previous nodes: " << h.node->previous[0]->data << ", "
-            << h.node->previous[1]->data << '\n';
+  std::cout << "c previous nodes: " << c.node->previous[0] << ", "
+            << c.node->previous[1] << '\n';
+  std::cout << "d previous nodes: " << d.node->previous[0] << ", "
+            << d.node->previous[1] << '\n';
+  std::cout << "e previous nodes: " << e.node->previous[0] << ", "
+            << e.node->previous[1] << '\n';
+  std::cout << "f previous nodes: " << f.node->previous[0] << ", "
+            << f.node->previous[1] << '\n';
+  std::cout << "g previous nodes: " << g.node->previous[0] << ", "
+            << g.node->previous[1] << '\n';
+  std::cout << "h previous nodes: " << h.node->previous[0] << ", "
+            << h.node->previous[1] << '\n';
 
   return 0;
 }

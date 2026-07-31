@@ -33,4 +33,7 @@ struct Value {
   explicit Value(std::shared_ptr<Node> node);
 };
 
+std::ostream& operator<<(std::ostream& os,
+                         const std::shared_ptr<Value::Node>& node);
+
 }  // namespace grad
