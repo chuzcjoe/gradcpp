@@ -1,5 +1,6 @@
 #include "Value.h"
 
+#include <algorithm>
 #include <ostream>
 #include <unordered_set>
 
@@ -69,6 +70,29 @@ std::vector<std::shared_ptr<Value::Node>> Value::BuildTopoOrder() const {
   visit(visit, node);
 
   return order;
+}
+
+void Value::Backward() {
+  auto topo_order = BuildTopoOrder();
+  node->grad = 1.0f;
+
+  std::ranges::reverse(topo_order);
+  for (const auto& current : topo_order) {
+    switch (current->op) {
+      case Operation::ADD:
+        current->previous[0]->grad += current->grad;
+        current->previous[1]->grad += current->grad;
+        break;
+      case Operation::MULTIPLY:
+        current->previous[0]->grad +=
+            current->previous[1]->data * current->grad;
+        current->previous[1]->grad +=
+            current->previous[0]->data * current->grad;
+        break;
+      case Operation::NONE:
+        break;
+    }
+  }
 }
 
 std::ostream& operator<<(std::ostream& os,

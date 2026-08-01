@@ -10,17 +10,13 @@ int main() {
   grad::Value c = a + b;
   grad::Value d = c * 3;
 
-  auto topo_order = d.BuildTopoOrder();
+  d.Backward();
 
-  std::cout << "c previous: " << c.previous()[0] << ", " << c.previous()[1]
-            << '\n';
-  std::cout << "d previous: " << d.previous()[0] << ", " << d.previous()[1]
-            << '\n';
-
-  std::cout << "Topo order of node C in the computation graph:\n";
-  for (const auto& node : topo_order) {
-    std::cout << node << '\n';
-  }
+  // print the values and gradients
+  std::cout << a.node << '\n';
+  std::cout << b.node << '\n';
+  std::cout << c.node << '\n';
+  std::cout << d.node << '\n';
 
   return 0;
 }
