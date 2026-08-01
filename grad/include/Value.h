@@ -2,6 +2,9 @@
 
 #include <array>
 #include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 namespace grad {
@@ -10,6 +13,7 @@ enum class Operation { NONE, ADD, MULTIPLY };
 
 struct Value {
   Value(float data, const Operation op = Operation::NONE);
+  Value(float data, std::string_view label);
 
   ~Value() = default;
 
@@ -21,11 +25,25 @@ struct Value {
 
   friend Value operator*(float scalar, const Value& value);
 
-  struct Node;
+  struct Node {
+    Node(float data, Operation op, std::string label = {})
+        : data(data), op(op), label(std::move(label)) {}
+
+    float data;
+    float grad = 0.0F;
+    Operation op;
+    std::string label;
+
+    std::array<std::shared_ptr<Node>, 2> previous{};
+  };
 
   [[nodiscard]] float data() const;
 
   [[nodiscard]] float grad() const;
+
+  [[nodiscard]] const std::string& label() const;
+
+  Value& SetLabel(std::string_view label);
 
   [[nodiscard]] const std::array<std::shared_ptr<Node>, 2>& previous() const;
 

@@ -6,18 +6,11 @@
 
 namespace grad {
 
-struct Value::Node {
-  Node(float data, Operation op) : data(data), op(op) {}
-
-  float data;
-  float grad = 0.0f;
-  Operation op;
-
-  std::array<std::shared_ptr<Node>, 2> previous{};
-};
-
 Value::Value(float data, const Operation op)
     : node(std::make_shared<Node>(data, op)) {}
+
+Value::Value(float data, const std::string_view label)
+    : node(std::make_shared<Node>(data, Operation::NONE, std::string(label))) {}
 
 Value::Value(std::shared_ptr<Node> node) : node(std::move(node)) {}
 
@@ -45,6 +38,13 @@ Value operator*(float scalar, const Value& value) {
 
 float Value::data() const { return node->data; }
 float Value::grad() const { return node->grad; }
+const std::string& Value::label() const { return node->label; }
+
+Value& Value::SetLabel(const std::string_view label) {
+  node->label = label;
+  return *this;
+}
+
 const std::array<std::shared_ptr<Value::Node>, 2>& Value::previous() const {
   return node->previous;
 }

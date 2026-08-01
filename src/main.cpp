@@ -1,22 +1,23 @@
 #include <iostream>
 
+#include "Graphviz.h"
 #include "Value.h"
 
 int main() {
   // c = a + b
   // d = c * 3
-  grad::Value a(2.0f);
-  grad::Value b(3.0f);
+  grad::Value a(2.0f, "a");
+  grad::Value b(3.0f, "b");
   grad::Value c = a + b;
+  c.SetLabel("c");
   grad::Value d = c * 3;
+  d.SetLabel("d");
+  grad::Value e = d + a;
+  e.SetLabel("e");
 
-  d.Backward();
+  e.Backward();
 
-  // print the values and gradients
-  std::cout << a.node << '\n';
-  std::cout << b.node << '\n';
-  std::cout << c.node << '\n';
-  std::cout << d.node << '\n';
+  grad::Graphviz(e).Print(std::cout);
 
   return 0;
 }
