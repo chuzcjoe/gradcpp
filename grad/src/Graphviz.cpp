@@ -105,6 +105,8 @@ std::string OperationSymbol(const Operation operation) {
       return "+";
     case Operation::MULTIPLY:
       return "*";
+    case Operation::POWER:
+      return "^";
     case Operation::NONE:
       return "?";
   }

@@ -36,6 +36,14 @@ Value operator*(float scalar, const Value& value) {
   return Value(scalar) * value;
 }
 
+Value Value::Power(const float x) {
+  auto new_node =
+      std::make_shared<Node>(std::pow(node->data, x), Operation::POWER);
+  auto const_x = Value(x);
+  new_node->previous = {node, const_x.node};
+  return Value(std::move(new_node));
+}
+
 float Value::data() const { return node->data; }
 float Value::grad() const { return node->grad; }
 const std::string& Value::label() const { return node->label; }
@@ -72,6 +80,7 @@ std::vector<std::shared_ptr<Value::Node>> Value::BuildTopoOrder() const {
   return order;
 }
 
+// Only the root node should call this function.
 void Value::Backward() {
   auto topo_order = BuildTopoOrder();
   node->grad = 1.0f;
@@ -88,6 +97,13 @@ void Value::Backward() {
             current->previous[1]->data * current->grad;
         current->previous[1]->grad +=
             current->previous[0]->data * current->grad;
+        break;
+      case Operation::POWER:
+        current->previous[0]->grad +=
+            current->previous[1]->data *
+            std::pow(current->previous[0]->data,
+                     current->previous[1]->data - 1.0f) *
+            current->grad;
         break;
       case Operation::NONE:
         break;

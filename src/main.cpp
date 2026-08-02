@@ -14,10 +14,11 @@ int main() {
   d.SetLabel("d");
   grad::Value e = d + a;
   e.SetLabel("e");
+  grad::Value f = e.Power(2.0f);
 
-  e.Backward();
+  f.Backward();
 
-  grad::Graphviz(e).Print(std::cout);
+  grad::Graphviz(f).Print(std::cout);
 
   return 0;
 }
