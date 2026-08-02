@@ -36,11 +36,18 @@ Value operator*(float scalar, const Value& value) {
   return Value(scalar) * value;
 }
 
-Value Value::Power(const float x) {
+Value Value::Power(const float x) const {
   auto new_node =
       std::make_shared<Node>(std::pow(node->data, x), Operation::POWER);
-  auto const_x = Value(x);
-  new_node->previous = {node, const_x.node};
+  auto power_out = Value(x);
+  new_node->previous = {node, power_out.node};
+  return Value(std::move(new_node));
+}
+
+Value Value::Relu() const {
+  auto new_node =
+      std::make_shared<Node>(std::max(0.0f, node->data), Operation::RELU);
+  new_node->previous = {node, nullptr};
   return Value(std::move(new_node));
 }
 
@@ -104,6 +111,10 @@ void Value::Backward() {
             std::pow(current->previous[0]->data,
                      current->previous[1]->data - 1.0f) *
             current->grad;
+        break;
+      case Operation::RELU:
+        current->previous[0]->grad +=
+            (current->previous[0]->data > 0.0f ? 1.0f : 0.0f) * current->grad;
         break;
       case Operation::NONE:
         break;

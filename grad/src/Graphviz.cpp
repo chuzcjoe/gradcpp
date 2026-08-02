@@ -107,6 +107,8 @@ std::string OperationSymbol(const Operation operation) {
       return "*";
     case Operation::POWER:
       return "^";
+    case Operation::RELU:
+      return "relu";
     case Operation::NONE:
       return "?";
   }
@@ -149,21 +151,46 @@ class Renderer {
   Canvas RenderNode(const std::shared_ptr<Value::Node>& node,
                     const bool is_root) {
     const bool is_shared = !expanded_.insert(node.get()).second;
-    const bool has_inputs = node->previous[0] != nullptr &&
-                            node->previous[1] != nullptr &&
-                            node->op != Operation::NONE;
     if (is_shared) {
       return MakeReference(node);
     }
-    if (!has_inputs) {
+    if (node->op == Operation::NONE || node->previous[0] == nullptr) {
       return MakeValueBox(node, is_root);
     }
 
     Canvas left = RenderNode(node->previous[0], false);
+    const GraphStep step{.operation = MakeBox({OperationSymbol(node->op)}),
+                         .result = MakeValueBox(node, is_root)};
+    if (node->previous[1] == nullptr) {
+      return CombineUnary(left, step);
+    }
+
     Canvas right = RenderNode(node->previous[1], false);
-    return Combine({.left = std::move(left), .right = std::move(right)},
-                   {.operation = MakeBox({OperationSymbol(node->op)}),
-                    .result = MakeValueBox(node, is_root)});
+    return Combine({.left = std::move(left), .right = std::move(right)}, step);
+  }
+
+  [[nodiscard]] static Canvas CombineUnary(const Canvas& child,
+                                           const GraphStep& step) {
+    Canvas canvas;
+    canvas.center =
+        std::max({child.center, step.operation.center, step.result.center});
+    const std::size_t right_width =
+        std::max({child.width - child.center,
+                  step.operation.width - step.operation.center,
+                  step.result.width - step.result.center});
+    canvas.width = canvas.center + right_width;
+    AppendCentered(canvas, child);
+    canvas.lines.push_back(
+        Place(canvas.width, {.position = canvas.center, .text = "│"}));
+    canvas.lines.push_back(
+        Place(canvas.width, {.position = canvas.center, .text = "▼"}));
+    AppendCentered(canvas, step.operation);
+    canvas.lines.push_back(
+        Place(canvas.width, {.position = canvas.center, .text = "│"}));
+    canvas.lines.push_back(
+        Place(canvas.width, {.position = canvas.center, .text = "▼"}));
+    AppendCentered(canvas, step.result);
+    return canvas;
   }
 
   [[nodiscard]] static Canvas Combine(ChildCanvases children,
