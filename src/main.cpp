@@ -86,7 +86,7 @@ int main() {
     loss.Backward();
 
     for (grad::Value* parameter : parameters) {
-      parameter->node->data -= learning_rate * parameter->grad();
+      parameter->data() -= learning_rate * parameter->grad();
     }
   }
 

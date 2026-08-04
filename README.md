@@ -60,7 +60,7 @@ mlp.ZeroGrad();
 loss.Backward();
 
 for (grad::Value* parameter : mlp.Parameters()) {
-  parameter->node->data -= learning_rate * parameter->grad();
+  parameter->data() -= learning_rate * parameter->grad();
 }
 ```
 

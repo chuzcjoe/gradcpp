@@ -66,10 +66,6 @@ Value Value::Tanh() const {
   return Value(std::move(new_node));
 }
 
-float Value::data() const { return node->data; }
-float Value::grad() const { return node->grad; }
-const std::string& Value::label() const { return node->label; }
-
 Value& Value::SetLabel(const std::string_view label) {
   node->label = label;
   return *this;

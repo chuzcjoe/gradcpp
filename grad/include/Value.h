@@ -47,11 +47,11 @@ struct Value {
     std::array<std::shared_ptr<Node>, 2> previous{};
   };
 
-  [[nodiscard]] float data() const;
+  [[nodiscard]] float& data() const { return node->data; }
 
-  [[nodiscard]] float grad() const;
+  [[nodiscard]] float grad() const { return node->grad; }
 
-  [[nodiscard]] const std::string& label() const;
+  [[nodiscard]] const std::string& label() const { return node->label; }
 
   Value& SetLabel(std::string_view label);
 
