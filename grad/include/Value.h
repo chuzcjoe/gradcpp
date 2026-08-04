@@ -9,7 +9,7 @@
 
 namespace grad {
 
-enum class Operation { NONE, ADD, MULTIPLY, POWER, RELU };
+enum class Operation { NONE, ADD, MULTIPLY, POWER, RELU, TANH };
 
 struct Value {
   Value(float data, const Operation op = Operation::NONE);
@@ -28,6 +28,8 @@ struct Value {
   Value Power(const float x) const;
 
   Value Relu() const;
+
+  Value Tanh() const;
 
   struct Node {
     Node(float data, Operation op, std::string label = {})

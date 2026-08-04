@@ -51,6 +51,13 @@ Value Value::Relu() const {
   return Value(std::move(new_node));
 }
 
+Value Value::Tanh() const {
+  float tanh_value = std::tanh(node->data);
+  auto new_node = std::make_shared<Node>(tanh_value, Operation::TANH);
+  new_node->previous = {node, nullptr};
+  return Value(std::move(new_node));
+}
+
 float Value::data() const { return node->data; }
 float Value::grad() const { return node->grad; }
 const std::string& Value::label() const { return node->label; }
@@ -115,6 +122,10 @@ void Value::Backward() {
       case Operation::RELU:
         current->previous[0]->grad +=
             (current->previous[0]->data > 0.0f ? 1.0f : 0.0f) * current->grad;
+        break;
+      case Operation::TANH:
+        current->previous[0]->grad +=
+            (1.0f - (current->data * current->data)) * current->grad;
         break;
       case Operation::NONE:
         break;

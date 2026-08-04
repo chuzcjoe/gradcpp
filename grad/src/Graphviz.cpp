@@ -109,6 +109,8 @@ std::string OperationSymbol(const Operation operation) {
       return "^";
     case Operation::RELU:
       return "relu";
+    case Operation::TANH:
+      return "tanh";
     case Operation::NONE:
       return "?";
   }
