@@ -19,7 +19,11 @@ struct Value {
 
   Value operator+(const Value& other) const;
 
+  Value operator-(const Value& other) const;
+
   Value operator*(const Value& other) const;
+
+  Value operator/(const Value& other) const;
 
   friend Value operator+(float scalar, const Value& value);
 

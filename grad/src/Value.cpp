@@ -21,11 +21,19 @@ Value Value::operator+(const Value& other) const {
   return Value(std::move(new_node));
 }
 
+Value Value::operator-(const Value& other) const {
+  return *this + (-1.0f * other);
+}
+
 Value Value::operator*(const Value& other) const {
   auto new_node = std::make_shared<Node>(node->data * other.node->data,
                                          Operation::MULTIPLY);
   new_node->previous = {node, other.node};
   return Value(std::move(new_node));
+}
+
+Value Value::operator/(const Value& other) const {
+  return *this * other.Power(-1.0f);
 }
 
 Value operator+(float scalar, const Value& value) {

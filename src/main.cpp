@@ -46,7 +46,7 @@ int main() {
       {0.5f, 1.0f, 1.0f},
   }};
   constexpr std::array<float, 3> targets{-1.0f, 1.0f, -1.0f};
-  constexpr std::size_t training_steps = 20;
+  constexpr std::size_t training_steps = 50;
   constexpr float learning_rate = 0.1f;
 
   std::cout << "MLP parameter count: " << mlp.ParameterCount() << '\n';
@@ -70,7 +70,7 @@ int main() {
   const auto calculate_loss = [&targets](const auto& predictions) {
     grad::Value loss(0.0f);
     for (std::size_t i = 0; i < predictions.size(); ++i) {
-      const auto error = predictions[i] + (-targets[i]);
+      const auto error = predictions[i] - targets[i];
       loss = loss + error.Power(2.0f);
     }
     return loss;
